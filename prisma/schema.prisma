@@ -20,10 +20,10 @@ model User {
   email     String  @unique
   password  String
   phone     String?
-  organizations Organization[]
+  organisations Organisation[]
 }
 
-model Organization {
+model Organisation {
   orgId       String  @id @default(uuid())
   name        String
   description String?
