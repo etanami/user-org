@@ -21,7 +21,7 @@ export type Login = {
 
 const prisma = new PrismaClient();
 
-export async function RegisterUser(req: Request, res: Response) {
+export async function registerUser(req: Request, res: Response) {
   const { firstName, lastName, email, password, phone }: Register = req.body;
 
   // validate fields from user
@@ -75,7 +75,6 @@ export async function RegisterUser(req: Request, res: Response) {
       },
     });
   } catch (err) {
-    console.error(err);
     return res.status(400).json({
       status: "Bad request",
       message: "Registration unsuccessful",
@@ -84,7 +83,7 @@ export async function RegisterUser(req: Request, res: Response) {
   }
 }
 
-export async function LoginUser(req: Request, res: Response) {
+export async function loginUser(req: Request, res: Response) {
   const { email, password }: Login = req.body;
 
   try {
@@ -129,11 +128,55 @@ export async function LoginUser(req: Request, res: Response) {
       },
     });
   } catch (err) {
-    console.error(err);
     return res.status(401).json({
       status: "Bad request",
       message: "Authentication failed",
       statusCode: 401,
+    });
+  }
+}
+
+export async function getUser(req: Request, res: Response) {
+  const { id } = req.params;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        userId: id,
+      },
+      select: {
+        userId: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        phone: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        status: "Not found",
+        message: "User doesn't exist",
+        statusCode: "404",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "User found",
+      data: {
+        userId: user.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+      },
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: "Bad request",
+      message: "Error",
+      statusCode: "400",
     });
   }
 }
