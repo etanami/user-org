@@ -12,12 +12,12 @@ export type Register = {
   email: string;
   password: string;
   phone: string;
-}
+};
 
 export type Login = {
   email: string;
   password: string;
-}
+};
 
 const prisma = new PrismaClient();
 
@@ -58,7 +58,7 @@ export async function RegisterUser(req: Request, res: Response) {
     });
 
     // generate JWT token
-    const token = generateJWTToken()
+    const token = generateJWTToken();
 
     return res.status(201).json({
       status: "success",
@@ -98,7 +98,7 @@ export async function LoginUser(req: Request, res: Response) {
         firstName: true,
         lastName: true,
         password: true,
-        phone: true
+        phone: true,
       },
     });
 
@@ -107,12 +107,12 @@ export async function LoginUser(req: Request, res: Response) {
       return res.status(401).json({
         status: "Bad request",
         message: "Authentication failed",
-        statusCode: "401"
-      })
+        statusCode: "401",
+      });
     }
 
     // generate JWT token
-    const token = generateJWTToken()
+    const token = generateJWTToken();
 
     return res.status(200).json({
       status: "success",
@@ -125,9 +125,9 @@ export async function LoginUser(req: Request, res: Response) {
           lastName: user.lastName,
           email,
           phone: user.phone,
-        }
-      }
-  })
+        },
+      },
+    });
   } catch (err) {
     console.error(err);
     return res.status(401).json({
