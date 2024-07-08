@@ -13,7 +13,7 @@ export function authenticateToken(
   res: Response,
   next: NextFunction
 ) {
-  const bearerHeader = req.headers["Authorization"];
+  const bearerHeader = req.headers["authorization"];
 
   if (!bearerHeader || typeof bearerHeader !== "string") {
     return res.status(401).json({
@@ -24,19 +24,16 @@ export function authenticateToken(
 
   const token = bearerHeader.split(" ")[1];
 
-  if (!token) {
-    return res.status(401).json({
-      status: "Unauthorized",
-      message: "Provide token",
-    });
-  }
-
   jwt.verify(token, process.env.JWT_SECRET_KEY as string, (err, user) => {
     if (err) {
-      return res.status(403).json({
-        status: "Forbidden",
-        message: "Invalid token",
-      });
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).json({ message: "Token expired" });
+      } else {
+        return res.status(403).json({
+          status: "Forbidden",
+          message: "Invalid token",
+        });
+      }
     }
 
     req.user = user;
