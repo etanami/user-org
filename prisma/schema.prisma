@@ -14,18 +14,27 @@ datasource db {
 }
 
 model User {
-  userId        String  @id @default(uuid())
-  firstName String
-  lastName  String
-  email     String  @unique
-  password  String
-  phone     String?
-  organisations Organisation[]
+  userId        String             @id @default(uuid())
+  firstName     String
+  lastName      String
+  email         String             @unique
+  password      String
+  phone         String?
+  organisations UserOrganisation[]
 }
 
 model Organisation {
-  orgId       String  @id @default(uuid())
+  orgId       String             @id @default(uuid())
   name        String
   description String?
-  users User[]
+  users       UserOrganisation[]
+}
+
+model UserOrganisation {
+  userId       String
+  orgId        String
+  user         User         @relation(fields: [userId], references: [userId])
+  organisation Organisation @relation(fields: [orgId], references: [orgId])
+
+  @@id([userId, orgId])
 }
