@@ -46,7 +46,7 @@ export async function getAllUserOrganisations(req: AuthRequest, res: Response) {
       },
     });
   } catch (err) {
-    return res.status(403).json({
+    return res.status(401).json({
       status: "Bad request",
       message: "Client error",
       statusCode: 401,
@@ -109,9 +109,50 @@ export async function getOneUserOrganisation(req: AuthRequest, res: Response) {
     });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({
-      message: "Internal server error",
-      statusCode: 500,
+    return res.status(400).json({
+      message: "Bad request",
+      statusCode: 400,
     });
+  }
+}
+
+export async function createOrganisation(req: Request, res: Response) {
+  const { name, description } = req.body;
+  const userId = (req as any).user.userId;
+
+  try {
+    // check if organisation name is inputed
+    if (!name || typeof name === null) {
+      return res.status(422).json({
+        name: "Organisation name is required",
+      });
+    }
+
+    const organisation = await prisma.organisation.create({
+      data: {
+        name,
+        description,
+        users: {
+          create: {
+            userId,
+          },
+        },
+      },
+    });
+
+    return res.status(201).json({
+      status: "success",
+      message: "Organisation created successfully",
+      data: {
+        name,
+        description,
+      },
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: "Bad Request",
+      message: "Client error",
+      statusCode: 400
+  });
   }
 }
