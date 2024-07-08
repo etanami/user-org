@@ -58,13 +58,13 @@ export async function registerUser(req: Request, res: Response) {
     });
 
     // generate JWT token
-    const token = generateJWTToken();
+    const accessToken = generateJWTToken(user);
 
     return res.status(201).json({
       status: "success",
       message: "Registration successful",
       data: {
-        accessToken: token,
+        accessToken,
         user: {
           userId: user.userId,
           firstName,
@@ -111,13 +111,13 @@ export async function loginUser(req: Request, res: Response) {
     }
 
     // generate JWT token
-    const token = generateJWTToken();
+    const accessToken = generateJWTToken(user);
 
     return res.status(200).json({
       status: "success",
       message: "Login successful",
       data: {
-        accessToken: token,
+        accessToken,
         user: {
           userId: user.userId,
           firstName: user.firstName,
