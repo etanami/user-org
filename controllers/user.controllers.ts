@@ -58,7 +58,8 @@ export async function registerUser(req: Request, res: Response) {
     });
 
     // generate JWT token
-    const accessToken = generateJWTToken(user);
+    const token = await generateJWTToken(user);
+    const accessToken = token.accessToken;
 
     return res.status(201).json({
       status: "success",
@@ -111,7 +112,8 @@ export async function loginUser(req: Request, res: Response) {
     }
 
     // generate JWT token
-    const accessToken = generateJWTToken(user);
+    const token = await generateJWTToken(user);
+    const accessToken = token.accessToken;
 
     return res.status(200).json({
       status: "success",
