@@ -49,13 +49,19 @@ export async function registerUser(req: Request, res: Response) {
         email,
         password: hashedPassword,
         phone,
-        organisations: {
-          create: {
-            name: `${firstName}'s Organisation`,
-          },
-        },
       },
     });
+
+    const organisation = await prisma.organisation.create({
+      data: {
+        name: `${firstName}'s Organisation`,
+        users: {
+          create: {
+            userId: user.userId,
+          },
+        },
+      }
+    })
 
     // generate JWT token
     const token = await generateJWTToken(user);
