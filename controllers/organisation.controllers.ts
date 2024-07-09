@@ -5,6 +5,12 @@ interface AuthRequest extends Request {
   user?: any;
 }
 
+interface Organisation {
+  orgId: string;
+  name: string;
+  description?: string | null;
+}
+
 const prisma = new PrismaClient();
 
 export async function getAllUserOrganisations(req: AuthRequest, res: Response) {
@@ -38,7 +44,7 @@ export async function getAllUserOrganisations(req: AuthRequest, res: Response) {
       status: "success",
       message: "User organisations retrieved successfully",
       data: {
-        organisations: organisations.map((organisation) => ({
+        organisations: organisations.map((organisation: Organisation) => ({
           orgId: organisation.orgId,
           name: organisation.name,
           description: organisation.description,
