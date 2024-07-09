@@ -6,6 +6,11 @@ dotenv.config();
 export async function generateJWTToken(user: any) {
   const { userId } = user;
 
+  // validate user ID
+  if (!userId) {
+    throw new Error("User ID is required to generate a token");
+  }
+
   const accessToken = jwt.sign(
     {
       userId,
