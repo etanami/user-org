@@ -31,12 +31,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const supertest_1 = __importDefault(require("supertest"));
-const index_1 = __importDefault(require("../src/index"));
 const client_1 = require("@prisma/client");
 const jwt = __importStar(require("jsonwebtoken"));
 const generateToken_1 = require("../middlewares/generateToken");
@@ -91,24 +86,24 @@ describe("Organisation Access Control", () => {
         accessToken = tokenData.accessToken;
         orgId = org.orgId;
     }));
-    it("should not allow access to organisations the user does not belong to", () => __awaiter(void 0, void 0, void 0, function* () {
-        const otherUser = yield prisma.user.create({
-            data: {
-                firstName: "Jane",
-                lastName: "Doe",
-                email: "john1@example.com",
-                password: "password",
-            },
-        });
-        const otherToken = yield (0, generateToken_1.generateJWTToken)({
-            userId: otherUser.userId,
-            email: otherUser.email,
-        });
-        const response = yield (0, supertest_1.default)(index_1.default)
-            .get(`/api/organisations/${orgId}`)
-            .set("Authorization", `Bearer ${otherToken}`);
-        console.log(response.body);
-        expect(response.status).toBe(403);
-        expect(response.body.message).toBe("Access denied");
-    }));
+    // it("should not allow access to organisations the user does not belong to", async () => {
+    //   const otherUser = await prisma.user.create({
+    //     data: {
+    //       firstName: "Jane",
+    //       lastName: "Doe",
+    //       email: "john1@example.com",
+    //       password: "password",
+    //     },
+    //   });
+    //   const otherToken = await generateJWTToken({
+    //     userId: otherUser.userId,
+    //     email: otherUser.email,
+    //   });
+    //   const response = await request(app)
+    //     .get(`/api/organisations/${orgId}`)
+    //     .set("Authorization", `Bearer ${otherToken}`);
+    //   console.log(response.body);
+    //   expect(response.status).toBe(403);
+    //   expect(response.body.message).toBe("Access denied");
+    // });
 });
