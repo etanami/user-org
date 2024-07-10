@@ -31,7 +31,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const supertest_1 = __importDefault(require("supertest"));
+const index_1 = __importDefault(require("../src/index"));
 const client_1 = require("@prisma/client");
 const jwt = __importStar(require("jsonwebtoken"));
 const generateToken_1 = require("../middlewares/generateToken");
@@ -106,4 +111,92 @@ describe("Organisation Access Control", () => {
     //   expect(response.status).toBe(403);
     //   expect(response.body.message).toBe("Access denied");
     // });
+});
+describe("Auth Endpoints", () => {
+    beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
+        // Cleanup database before tests
+        yield prisma.user.deleteMany({});
+        yield prisma.organisation.deleteMany({});
+    }));
+    afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield prisma.$disconnect();
+    }));
+    describe("POST /auth/register", () => {
+        it("Should Register User Successfully with Default Organisation", () => __awaiter(void 0, void 0, void 0, function* () {
+            const response = yield (0, supertest_1.default)(index_1.default).post("/auth/register").send({
+                firstName: "John",
+                lastName: "Doe",
+                email: "john@example.com",
+                password: "password123",
+            });
+            expect(response.status).toBe(201);
+            expect(response.body.data).toHaveProperty("user");
+            expect(response.body.data).toHaveProperty("accessToken");
+            expect(response.body.data.user).toHaveProperty("defaultOrganisation");
+            expect(response.body.data.user.defaultOrganisation.name).toBe("John's Organisation");
+        }));
+        it("Should Log the user in successfully", () => __awaiter(void 0, void 0, void 0, function* () {
+            const loginResponse = yield (0, supertest_1.default)(index_1.default).post("/auth/login").send({
+                email: "john@example.com",
+                password: "password123",
+            });
+            expect(loginResponse.status).toBe(200);
+            expect(loginResponse.body).toHaveProperty("accessToken");
+        }));
+        it("Should Fail If Required Fields Are Missing", () => __awaiter(void 0, void 0, void 0, function* () {
+            const missingFirstNameResponse = yield (0, supertest_1.default)(index_1.default)
+                .post("/auth/register")
+                .send({
+                lastName: "Doe",
+                email: "john2@example.com",
+                password: "password123",
+            });
+            expect(missingFirstNameResponse.status).toBe(422);
+            expect(missingFirstNameResponse.body.message).toContain("firstName is required");
+            const missingLastNameResponse = yield (0, supertest_1.default)(index_1.default)
+                .post("/auth/register")
+                .send({
+                firstName: "John",
+                email: "john2@example.com",
+                password: "password123",
+            });
+            expect(missingLastNameResponse.status).toBe(422);
+            expect(missingLastNameResponse.body.message).toContain("lastName is required");
+            const missingEmailResponse = yield (0, supertest_1.default)(index_1.default)
+                .post("/auth/register")
+                .send({
+                firstName: "John",
+                lastName: "Doe",
+                password: "password123",
+            });
+            expect(missingEmailResponse.status).toBe(422);
+            expect(missingEmailResponse.body.message).toContain("email is required");
+            const missingPasswordResponse = yield (0, supertest_1.default)(index_1.default)
+                .post("/auth/register")
+                .send({
+                firstName: "John",
+                lastName: "Doe",
+                email: "john2@example.com",
+            });
+            expect(missingPasswordResponse.status).toBe(422);
+            expect(missingPasswordResponse.body.message).toContain("password is required");
+        }));
+        it("Should Fail if there’s Duplicate Email or UserID", () => __awaiter(void 0, void 0, void 0, function* () {
+            const response1 = yield (0, supertest_1.default)(index_1.default).post("/auth/register").send({
+                firstName: "Jane",
+                lastName: "Doe",
+                email: "jane@example.com",
+                password: "password123",
+            });
+            expect(response1.status).toBe(201);
+            const response2 = yield (0, supertest_1.default)(index_1.default).post("/auth/register").send({
+                firstName: "Jane",
+                lastName: "Doe",
+                email: "jane@example.com",
+                password: "password123",
+            });
+            expect(response2.status).toBe(422);
+            expect(response2.body.message).toContain("Email already exists");
+        }));
+    });
 });
