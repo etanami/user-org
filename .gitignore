@@ -1,2 +1,4 @@
 node_modules
 .env
+backup.dump
+db_backup
