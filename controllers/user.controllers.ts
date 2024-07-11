@@ -49,6 +49,19 @@ export async function registerUser(req: Request, res: Response) {
   }
 
   try {
+    // check if email already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (existingUser) {
+      return res.status(422).json({
+        status: "Conflict",
+        message: "Email is already registered",
+        statusCode: 422,
+      });
+    }
+
     // hash password with bcrypt before creating in db
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -67,6 +80,7 @@ export async function registerUser(req: Request, res: Response) {
     const organisation = await prisma.organisation.create({
       data: {
         name: `${firstName}'s Organisation`,
+        description: `Organisation created by ${firstName} ${lastName}`,
         users: {
           create: {
             userId: user.userId,
