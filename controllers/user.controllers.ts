@@ -24,6 +24,9 @@ const prisma = new PrismaClient();
 export async function registerUser(req: Request, res: Response) {
   const { firstName, lastName, email, password, phone }: Register = req.body;
 
+  // email validation regex
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   // validate fields from user
   if (!firstName || !lastName || !email || !password || !phone) {
     return res.status(422).json({
@@ -32,6 +35,15 @@ export async function registerUser(req: Request, res: Response) {
         { field: "lastName", message: "Last name is required" },
         { field: "email", message: "Email is required" },
         { field: "password", message: "Password is required" },
+      ],
+    });
+  }
+
+  // validate email format
+  if (!emailRegex.test(email)) {
+    return res.status(422).json({
+      errors: [
+        { field: "email", message: "Invalid email format" },
       ],
     });
   }
@@ -92,6 +104,28 @@ export async function registerUser(req: Request, res: Response) {
 
 export async function loginUser(req: Request, res: Response) {
   const { email, password }: Login = req.body;
+
+  // email validation regex
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  // validate fields from user
+  if (!email || !password) {
+    return res.status(422).json({
+      errors: [
+        { field: "email", message: "Email is required" },
+        { field: "password", message: "Password is required" },
+      ],
+    });
+  }
+
+  // validate email format
+  if (!emailRegex.test(email)) {
+    return res.status(422).json({
+      errors: [
+        { field: "email", message: "Invalid email format" },
+      ],
+    });
+  }
 
   try {
     // find user by mail
