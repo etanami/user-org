@@ -129,7 +129,7 @@ function createOrganisation(req, res) {
         try {
             // check if organisation name is inputed
             if (!name || typeof name === null) {
-                return res.status(422).json({
+                return res.status(400).json({
                     name: "Organisation name is required",
                 });
             }

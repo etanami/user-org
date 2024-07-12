@@ -24,6 +24,8 @@ const prisma = new client_1.PrismaClient();
 function registerUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { firstName, lastName, email, password, phone } = req.body;
+        // email validation regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         // validate fields from user
         if (!firstName || !lastName || !email || !password || !phone) {
             return res.status(422).json({
@@ -35,7 +37,26 @@ function registerUser(req, res) {
                 ],
             });
         }
+        // validate email format
+        if (!emailRegex.test(email)) {
+            return res.status(422).json({
+                errors: [
+                    { field: "email", message: "Invalid email format" },
+                ],
+            });
+        }
         try {
+            // check if email already exists
+            const existingUser = yield prisma.user.findUnique({
+                where: { email }
+            });
+            if (existingUser) {
+                return res.status(422).json({
+                    status: "Conflict",
+                    message: "Email is already registered",
+                    statusCode: 422,
+                });
+            }
             // hash password with bcrypt before creating in db
             const saltRounds = 10;
             const hashedPassword = yield bcrypt_1.default.hash(password, saltRounds);
@@ -52,6 +73,7 @@ function registerUser(req, res) {
             const organisation = yield prisma.organisation.create({
                 data: {
                     name: `${firstName}'s Organisation`,
+                    description: `Organisation created by ${firstName} ${lastName}`,
                     users: {
                         create: {
                             userId: user.userId,
@@ -89,6 +111,25 @@ function registerUser(req, res) {
 function loginUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { email, password } = req.body;
+        // email validation regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        // validate fields from user
+        if (!email || !password) {
+            return res.status(422).json({
+                errors: [
+                    { field: "email", message: "Email is required" },
+                    { field: "password", message: "Password is required" },
+                ],
+            });
+        }
+        // validate email format
+        if (!emailRegex.test(email)) {
+            return res.status(422).json({
+                errors: [
+                    { field: "email", message: "Invalid email format" },
+                ],
+            });
+        }
         try {
             // find user by mail
             const user = yield prisma.user.findUnique({
