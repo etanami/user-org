@@ -23,6 +23,7 @@ Before you begin, ensure you have the following installed on your machine:
 ## Features
 
 - **User Registration & Login**
+
   - Hashes user passwords
   - Generates JWT tokens for authentication
   - Creates a default organisation for new users
@@ -35,6 +36,7 @@ Before you begin, ensure you have the following installed on your machine:
 ## Models
 
 ### User
+
 ```
 - userId: string (Unique)
 - firstName: string (Required)
@@ -45,6 +47,7 @@ Before you begin, ensure you have the following installed on your machine:
 ```
 
 ### Organisation
+
 ```
 - orgId: string (Unique)
 - name: string (Required)
@@ -56,6 +59,7 @@ Before you begin, ensure you have the following installed on your machine:
 ### Authentication
 
 - **POST /auth/register**
+
   - Registers a new user and creates a default organisation.
 
 - **POST /auth/login**
@@ -69,25 +73,29 @@ Before you begin, ensure you have the following installed on your machine:
 ### Organisation Management
 
 - **GET /api/organisations**
+
   - Retrieves all organisations the user belongs to or created.
 
 - **GET /api/organisations/:orgId**
+
   - Retrieves a single organisation record.
 
 - **POST /api/organisations**
+
   - Creates a new organisation.
 
 - **POST /api/organisations/:orgId/users**
   - Adds a user to a specific organisation.
 
-
 ## Testing
 
 ### Unit Testing
+
 - Test token generation and expiration.
 - Ensure users cannot access data from organisations they don’t have access to.
 
 ### End-to-End Testing
+
 - **It Should Register User Successfully**: Verify user registration, default organisation creation, and token issuance.
 - **It Should Log the User In Successfully**: Validate login functionality.
 - **It Should Fail If Required Fields Are Missing**: Ensure validation errors are returned for missing fields.
@@ -108,3 +116,54 @@ Before you begin, ensure you have the following installed on your machine:
 |--- package.json
 |--- tsconfig.json
 ```
+
+## How to Run
+
+1. Clone the repository:
+
+   ```bash
+   git clone git@github.com:etanami/user-org.git
+
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+
+   ```
+
+3. Set up the environment variables in .env.
+
+4. Build the project:
+
+   ```bash
+   npm run build
+
+   ```
+
+5. Start the application:
+
+   ```bash
+   npm run start
+
+   ```
+
+6. For development mode with hot reloading:
+
+   ```bash
+   npm run dev
+
+   ```
+
+7. Run tests:
+
+   ```bash
+   npm run test
+
+   ```
+
+8. To deploy the application:
+   ```bash
+   npm run deploy
+   ```
