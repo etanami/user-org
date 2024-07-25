@@ -22,7 +22,8 @@ export type Login = {
 const prisma = new PrismaClient();
 
 export async function registerUser(req: Request, res: Response) {
-  const { firstName, lastName, email, password, phone }: Register = req.body;
+  const { firstName, lastName, email, password }: Register = req.body;
+  const phone = req.body.phone;
 
   // email validation regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -108,6 +109,7 @@ export async function registerUser(req: Request, res: Response) {
       },
     });
   } catch (err) {
+    console.log(err)
     return res.status(400).json({
       status: "Bad request",
       message: "Registration unsuccessful",

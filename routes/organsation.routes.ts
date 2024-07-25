@@ -10,9 +10,11 @@ import { authenticateToken } from "../middlewares/authenticateToken";
 
 const router = Router();
 
-router.get("/", authenticateToken, getAllUserOrganisations);
-router.get("/:orgId", authenticateToken, getOneUserOrganisation);
-router.post("/", authenticateToken, createOrganisation);
-router.post("/:orgId/users", authenticateToken, addUserToAnOrganisation);
+router.use(authenticateToken);
+
+router.get("/", getAllUserOrganisations);
+router.get("/:orgId", getOneUserOrganisation);
+router.post("/", createOrganisation);
+router.post("/:orgId/users", addUserToAnOrganisation);
 
 export default router;
